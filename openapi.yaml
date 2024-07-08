@@ -1,0 +1,277 @@
+openapi: 3.0.3
+info:
+  version: '1.0'
+  title: Reactive Bank Account
+servers:
+  - url: https://localhost:8080
+tags:
+  - name: Пользователь
+    description: Отвечает за работу с пользователями
+  - name: Счет
+    description: Отвечает за работу с банковским счетом
+paths:
+  /api/v1/user:
+    post:
+      tags:
+        - Пользователь
+      summary: Регистрация пользователя
+      description: Позволяет зарегистрироваться
+      operationId: registerUser
+      requestBody:
+        description: Создание пользователя
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationRequest'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/RegistrationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RegistrationRequest'
+        required: true
+      responses:
+        '200':
+          description: Пользователь успешно зарегистрирован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+        '400':
+          description: Пользователь с указанным номером телефона уже существует
+        '500':
+          description: Что-то пошло не так
+  /api/v1/user/login:  
+    post:
+      tags:
+        - Пользователь
+      summary: Авторизация
+      description: Позволяет пользователю войти в аккаунт
+      operationId: loginUser
+      requestBody:
+        description: Авторизация пользователя
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        '200':
+          description: Пользователь успешно вошел в аккаунт
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '400':
+          description: Неверный логин или пароль
+          content:
+            application/json:
+                schema:
+                  $ref: '#/components/schemas/Response'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Что-то пошло не так
+          content:
+            application/json:
+                schema:
+                  $ref: '#/components/schemas/Response'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Response'
+    get:
+      tags:
+        - Пользователь
+      summary: Получение профиля пользователя
+      description: Позволяет получить профиль пользователя
+      operationId: getUserProfile
+      responses:
+        '200':
+          description: Пользователь успешно получил информацию о профиле
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+        '401':
+          description: Неавторизован
+          content:
+            application/json:
+                schema:
+                  $ref: '#/components/schemas/Response'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Response'  
+        '500':
+          description: Что-то пошло не так
+          content:
+            application/json:
+                schema:
+                  $ref: '#/components/schemas/Response'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Response'  
+      security:
+        - basicAuth:
+          - type:http
+          - scheme:basic
+  /api/v1/account:
+    get:
+      tags:
+        - Счет
+      summary: Получение счета
+      description: Позволяет пользователю получить его счет
+      operationId: getAccount
+      responses:
+        '200':
+          description: Счет успешно получен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankAccountDto'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/BankAccountDto'   
+        '401':
+          description: Неавторизован
+          content:
+            application/json:
+                schema:
+                  $ref: '#/components/schemas/Response'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Response'  
+      security:
+        - basicAuth:
+          - type:http
+          - scheme:basic
+    post:
+      tags:
+        - Счет
+      summary: Перевод денег
+      description: Позволяет пользователю перевести деньги на другой счет
+      operationId: sendMoney
+      parameters:
+        - name: accountId
+          in: query
+          description: Id счета, куда перевести деньги
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Деньги успешно переведены
+          content:
+            application/json:
+                schema:
+                  $ref: '#/components/schemas/BankAccountDto'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/BankAccountDto'   
+        '400':
+          description: Неверный id счета
+          content:
+            application/json:
+                schema:
+                  $ref: '#/components/schemas/Response'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Response'  
+        '401':
+          description: Неавторизован
+          content:
+            application/json:
+                schema:
+                  $ref: '#/components/schemas/Response'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Response'  
+      security:
+        - basicAuth:
+          - type:http
+          - scheme:basic
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      properties:
+        login:
+          description: Логин пользователя
+          type: string
+          example: example
+        password:
+          description: Пароль пользователя
+          type: string
+          example: password
+    RegistrationRequest:
+      type: object
+      properties:
+        login:
+          description: Логин пользователя
+          type: string
+          example: example
+        email:
+          description: Email пользователя
+          type: string
+          format: email
+        password:
+          description: Пароль пользователя
+          type: string
+          example: password
+    UserDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: a84876e7-2795-4531-9480-4a23542f7c31
+        email:
+          type: string
+          example: user@email.com
+        login:
+          type: string
+          example: 'user'
+      xml:
+        name: user
+    Response:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int64
+          example: 200
+        message:
+          type: string
+          example: "Все отлично"
+        timestamp:
+          type: string
+          format: date-time
+    BankAccountDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        amountOfMoney:
+          type: number
+          format: double
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
