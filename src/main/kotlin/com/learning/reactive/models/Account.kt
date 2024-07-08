@@ -8,6 +8,7 @@ import java.util.UUID
  * Счет
  */
 @Entity
+@Table(name = "t_accounts")
 class Account (
     /**
      * Идентификатор
@@ -19,7 +20,7 @@ class Account (
     /**
      * Идентификатор владельца счета
      */
-    @Column(name = "userId", nullable = false)
+    @Column(name = "user_id", nullable = false)
     val userId: UUID,
 
     /**

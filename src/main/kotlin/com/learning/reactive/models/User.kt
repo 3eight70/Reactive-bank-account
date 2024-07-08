@@ -10,31 +10,32 @@ import java.util.*
  * Пользователь
  */
 @Entity
+@Table(name = "t_users")
 class User (
     /**
      * Идентификатор
      */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    var id: UUID,
+    private val id: UUID,
 
     /**
      * Логин
      */
     @Column(name = "login",unique = true, nullable = false)
-    var login: String,
+    private val login: String,
 
     /**
      * Электронная почта
      */
     @Column(name = "email", unique = true, nullable = false)
-    var email: String,
+    private val email: String,
 
     /**
      * Пароль
      */
     @Column(name = "password", nullable = false)
-    var password: String
+    private var passwordHash: String
 ): UserDetails {
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         return mutableListOf(SimpleGrantedAuthority("ROLE_USER"))
@@ -63,6 +64,4 @@ class User (
     override fun isAccountNonLocked(): Boolean {
         return true
     }
-
-
 }

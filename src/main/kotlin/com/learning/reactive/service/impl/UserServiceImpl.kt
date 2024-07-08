@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class UserServiceImpl(private val userRepository: UserRepository) : UserDetailsService {
-    override fun loadUserByUsername(username: String): User {
-        return userRepository.findByUsername(username)
-            .orElseThrow{ UserNotFoundException(username) }
+    override fun loadUserByUsername(login: String): User {
+        return userRepository.findByLogin(login)
+            .orElseThrow{ UserNotFoundException(login) }
     }
 }

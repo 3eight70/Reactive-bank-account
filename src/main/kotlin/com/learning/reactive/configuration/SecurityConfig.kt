@@ -1,10 +1,11 @@
 package com.learning.reactive.configuration
 
-import org.springframework.cglib.core.Customizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.security.config.annotation.ObjectPostProcessor
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
 import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.web.server.SecurityWebFilterChain
@@ -15,8 +16,23 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableWebFluxSecurity
-@EnableMethodSecurity
 class SecurityConfig {
+    @Bean
+    fun securityBeanPostProcessor(): ObjectPostProcessor<Any> {
+        return SecurityBeanPostProcessor()
+    }
+
+    @Bean
+    fun authenticationManagerBuilder(): AuthenticationManagerBuilder {
+        return AuthenticationManagerBuilder(securityBeanPostProcessor())
+    }
+
+    private class SecurityBeanPostProcessor : ObjectPostProcessor<Any> {
+        override fun <T : Any?> postProcess(objectInstance: T): T {
+            return objectInstance
+        }
+    }
+
     @Bean
     fun corsConfiguration(): CorsConfigurationSource {
         val corsConfiguration = CorsConfiguration()

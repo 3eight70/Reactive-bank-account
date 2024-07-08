@@ -1,9 +1,9 @@
 package com.learning.reactive.repository
 
 import com.learning.reactive.models.User
-import org.springframework.data.repository.CrudRepository
+import org.springframework.data.jpa.repository.JpaRepository
 import java.util.*
 
-interface UserRepository : CrudRepository<User, UUID> {
-    fun findByUsername(username: String): Optional<User>
+interface UserRepository : JpaRepository<User, UUID> {
+    fun findByLogin(login: String): Optional<User>
 }
