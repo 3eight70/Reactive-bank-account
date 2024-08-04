@@ -41,7 +41,6 @@ class UserServiceImpl(
         return Mono.just(userDto)
     }
 
-    @Transactional
     override fun loginUser(dto: LoginUserRequestDto): Mono<AuthResponseDto> {
         return securityService.authenticate(dto.login, dto.password)
             .flatMap { tokenDetails -> Mono.just(
