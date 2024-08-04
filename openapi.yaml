@@ -10,7 +10,7 @@ tags:
   - name: Счет
     description: Отвечает за работу с банковским счетом
 paths:
-  /api/v1/user:
+  /api/v1/user/register:
     post:
       tags:
         - Пользователь
@@ -127,26 +127,30 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'  
       security:
-        - basicAuth:
+        - bearerAuth:
           - type:http
-          - scheme:basic
+          - scheme:bearer
   /api/v1/account:
     get:
       tags:
         - Счет
-      summary: Получение счета
-      description: Позволяет пользователю получить его счет
+      summary: Получение счетов
+      description: Позволяет пользователю получить его счета
       operationId: getAccount
       responses:
         '200':
-          description: Счет успешно получен
+          description: Счета успешно получены
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BankAccountDto'          
+                type: array
+                items:
+                  $ref: '#/components/schemas/BankAccountDto'
             application/xml:
               schema:
-                $ref: '#/components/schemas/BankAccountDto'   
+                type: array
+                items:
+                  $ref: '#/components/schemas/BankAccountDto'
         '401':
           description: Неавторизован
           content:
@@ -157,9 +161,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'  
       security:
-        - basicAuth:
+        - bearerAuth:
           - type:http
-          - scheme:basic
+          - scheme:bearer
     post:
       tags:
         - Счет
@@ -203,9 +207,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'  
       security:
-        - basicAuth:
+        - bearerAuth:
           - type:http
-          - scheme:basic
+          - scheme:bearer
 components:
   schemas:
     LoginRequest:
@@ -272,6 +276,6 @@ components:
           type: number
           format: double
   securitySchemes:
-    basicAuth:
+    bearerAuth:
       type: http
-      scheme: basic
+      scheme: bearer

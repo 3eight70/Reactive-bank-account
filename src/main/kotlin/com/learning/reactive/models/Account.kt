@@ -2,14 +2,14 @@ package com.learning.reactive.models
 
 import jakarta.persistence.*
 import java.math.BigDecimal
-import java.util.UUID
+import java.util.*
 
 /**
  * Счет
  */
 @Entity
 @Table(name = "t_accounts")
-class Account (
+data class Account (
     /**
      * Идентификатор
      */

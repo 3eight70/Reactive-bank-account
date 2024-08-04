@@ -3,11 +3,11 @@ package com.learning.reactive.models
 import jakarta.persistence.*
 import java.math.BigDecimal
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 @Entity
 @Table(name = "t_transactions")
-class Transaction (
+data class Transaction (
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: UUID,

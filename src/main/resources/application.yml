@@ -5,9 +5,9 @@ spring:
     enabled: true
     change-log: db/changelog/main-changelog.xml
   datasource:
-    url: jdbc:postgresql://localhost:5432/reactive
-    username: postgres
-    password: gbhfns
+    url: ${JDBC_URL:jdbc:postgresql://localhost:5432/reactive}
+    username: ${JDBC_USERNAME:postgres}
+    password: ${JDBC_PASSWORD:gbhfns}
     driverClassName: org.postgresql.Driver
   jpa:
     hibernate:
@@ -15,3 +15,13 @@ spring:
     show-sql: true
   main:
     web-application-type: reactive
+
+jwt:
+  password:
+    encoder:
+      secret: ${ENCODER_SECRET:5n7zyM6bLEBw?XpG}
+      iteration: ${ENCODER_ITERATION:64}
+      keylength: ${ENCODER_KEY_LENGTH:256}
+  secret: ${JWT_SECRET:5n7zyM6bLEBfasfasfasfasfsaw}
+  expiration: ${JWT_EXPIRATION:3600}
+  issuer: ${JWT_ISSUER:bank}

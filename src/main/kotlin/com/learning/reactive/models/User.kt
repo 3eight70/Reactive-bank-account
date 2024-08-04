@@ -49,12 +49,20 @@ class User (
         return login
     }
 
+    fun getEmail(): String {
+        return email
+    }
+
+    fun getId(): UUID {
+        return id
+    }
+
     override fun isCredentialsNonExpired(): Boolean {
         return true
     }
 
     override fun getPassword(): String {
-        return password
+        return passwordHash
     }
 
     override fun isAccountNonExpired(): Boolean {
