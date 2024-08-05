@@ -9,7 +9,7 @@ object UserAuthenticationBearer {
     fun create(result : JwtHandler.VerificationResult) : Mono<Authentication> {
         val claims = result.claims
         val subject = claims.subject
-        val email = claims.get("role", String::class.java)
+        val email = claims.get("email", String::class.java)
         val login = claims.get("login", String::class.java)
 
         val principal = CustomPrincipal(UUID.fromString(subject), login, email)

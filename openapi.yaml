@@ -3,13 +3,52 @@ info:
   version: '1.0'
   title: Reactive Bank Account
 servers:
-  - url: https://localhost:8080
+  - url: http://localhost:8080
 tags:
   - name: Пользователь
     description: Отвечает за работу с пользователями
   - name: Счет
     description: Отвечает за работу с банковским счетом
 paths:
+  /api/v1/user:
+    get:
+      tags:
+        - Пользователь
+      summary: Получение профиля пользователя
+      description: Позволяет получить профиль пользователя
+      operationId: getUserProfile
+      responses:
+        '200':
+          description: Пользователь успешно получил информацию о профиле
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+        '401':
+          description: Неавторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '500':
+          description: Что-то пошло не так
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - bearerAuth:
+            - type:http
+            - scheme:bearer
   /api/v1/user/register:
     post:
       tags:
@@ -22,13 +61,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RegistrationRequest'
+              $ref: '#/components/schemas/RegisterUserRequestDto'
           application/xml:
             schema:
-              $ref: '#/components/schemas/RegistrationRequest'
+              $ref: '#/components/schemas/RegisterUserRequestDto'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/RegistrationRequest'
+              $ref: '#/components/schemas/RegisterUserRequestDto'
         required: true
       responses:
         '200':
@@ -56,13 +95,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LoginRequest'
+              $ref: '#/components/schemas/LoginUserRequestDto'
           application/xml:
             schema:
-              $ref: '#/components/schemas/LoginRequest'
+              $ref: '#/components/schemas/LoginUserRequestDto'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/LoginRequest'
+              $ref: '#/components/schemas/LoginUserRequestDto'
         required: true
       responses:
         '200':
@@ -92,44 +131,6 @@ paths:
             application/xml:
               schema:
                 $ref: '#/components/schemas/Response'
-    get:
-      tags:
-        - Пользователь
-      summary: Получение профиля пользователя
-      description: Позволяет получить профиль пользователя
-      operationId: getUserProfile
-      responses:
-        '200':
-          description: Пользователь успешно получил информацию о профиле
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserDto'          
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/UserDto'
-        '401':
-          description: Неавторизован
-          content:
-            application/json:
-                schema:
-                  $ref: '#/components/schemas/Response'          
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Response'  
-        '500':
-          description: Что-то пошло не так
-          content:
-            application/json:
-                schema:
-                  $ref: '#/components/schemas/Response'          
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Response'  
-      security:
-        - bearerAuth:
-          - type:http
-          - scheme:bearer
   /api/v1/account:
     get:
       tags:
@@ -212,7 +213,7 @@ paths:
           - scheme:bearer
 components:
   schemas:
-    LoginRequest:
+    LoginUserRequestDto:
       type: object
       properties:
         login:
@@ -222,8 +223,8 @@ components:
         password:
           description: Пароль пользователя
           type: string
-          example: password
-    RegistrationRequest:
+          example: password1
+    RegisterUserRequestDto:
       type: object
       properties:
         login:
@@ -237,7 +238,7 @@ components:
         password:
           description: Пароль пользователя
           type: string
-          example: password
+          example: password1
     UserDto:
       type: object
       properties:
@@ -266,6 +267,19 @@ components:
         timestamp:
           type: string
           format: date-time
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldError'
+    CustomFieldError:
+      type: object
+      properties:
+        field:
+          type: string
+          example: "login"
+        message:
+          type: string
+          example: "Логин должен быть указан"
     BankAccountDto:
       type: object
       properties:

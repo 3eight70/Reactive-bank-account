@@ -1,5 +1,8 @@
 package com.learning.reactive.dto.user
 
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
+
 /**
  * Запрос на авторизацию
  */
@@ -7,9 +10,13 @@ data class LoginUserRequestDto (
     /**
      * Логин пользователя
      */
-    val login: String,
+    @field:NotNull(message = "Логин должен быть указан")
+    @field:NotBlank(message = "Логин должен быть указан")
+    val login: String?,
     /**
      * Пароль пользователя
      */
-    val password: String
+    @field:NotNull(message = "Пароль должен быть указан")
+    @field:NotBlank(message = "Пароль должен быть указан")
+    val password: String?
 )

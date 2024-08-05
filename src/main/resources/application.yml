@@ -19,9 +19,9 @@ spring:
 jwt:
   password:
     encoder:
-      secret: ${ENCODER_SECRET:5n7zyM6bLEBw?XpG}
+      secret: ${ENCODER_SECRET:FZK2DZ82odqS13e8aENggaMbb_fAkl-nJL4AEVBX43g}
       iteration: ${ENCODER_ITERATION:64}
       keylength: ${ENCODER_KEY_LENGTH:256}
-  secret: ${JWT_SECRET:5n7zyM6bLEBfasfasfasfasfsaw}
+  secret: ${JWT_SECRET:8506876256f3e572b83d7d5a0b86b503c7b7e68c430d69d5307e865d8619d05f}
   expiration: ${JWT_EXPIRATION:3600}
   issuer: ${JWT_ISSUER:bank}

@@ -19,6 +19,16 @@ class ReactiveUserRepository(private val userRepository: UserRepository) {
             }
     }
 
+    fun findByEmail(email: String): Mono<User> {
+        return Mono.fromCallable {
+            userRepository.findByEmail(email)
+        }
+            .subscribeOn(Schedulers.boundedElastic())
+            .flatMap {
+                if (it != null) Mono.just(it) else Mono.empty()
+            }
+    }
+
     fun findById(id: UUID): Mono<User> {
         return Mono.fromCallable {
             userRepository.findById(id)
