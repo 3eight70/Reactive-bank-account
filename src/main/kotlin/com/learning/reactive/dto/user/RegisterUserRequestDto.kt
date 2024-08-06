@@ -5,12 +5,15 @@ import jakarta.validation.constraints.*
 /**
  * Запрос на регистрацию пользователя
  */
-data class RegisterUserRequestDto (
+data class RegisterUserRequestDto(
     /**
      * Логин пользователя
      */
     @field:NotNull(message = "Логин должен быть указан")
-    @field:Pattern(regexp = "[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\\.[a-zA-Z0-9_-]+|([a-zA-Z0-9]+)", message = "Логин должен состоять из букв и цифр")
+    @field:Pattern(
+        regexp = "[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\\.[a-zA-Z0-9_-]+|([a-zA-Z0-9]+)",
+        message = "Логин должен состоять из букв и цифр"
+    )
     @field:NotBlank(message = "Логин должен быть указан")
     val login: String?,
     /**

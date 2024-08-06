@@ -1,12 +1,15 @@
-package com.learning.reactive.repository
+package com.learning.reactive.repository.reactive
 
 import com.learning.reactive.models.User
+import com.learning.reactive.repository.UserRepository
 import org.springframework.stereotype.Repository
-import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
 import java.util.*
 
+/**
+ * Реактивная обертка-репозиторий для пользователя
+ */
 @Repository
 class ReactiveUserRepository(private val userRepository: UserRepository) {
     fun findByLogin(login: String): Mono<User> {
@@ -38,13 +41,8 @@ class ReactiveUserRepository(private val userRepository: UserRepository) {
             .flatMap {
                 if (it != null) Mono.just(it) else Mono.empty()
             }
-            .subscribeOn(Schedulers.boundedElastic())
-            .flatMap {
-                if (it != null) Mono.just(it) else Mono.empty()
-            }
     }
 
-    @Transactional
     fun save(user: User): Mono<User> {
         return Mono.fromCallable {
             userRepository.save(user)

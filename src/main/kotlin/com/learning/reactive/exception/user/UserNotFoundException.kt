@@ -1,4 +1,5 @@
 package com.learning.reactive.exception.user
 
-class UserNotFoundException(username: String)
-    : RuntimeException("Пользователь с именем $username не найден")
+import com.learning.reactive.exception.common.NotFoundException
+
+class UserNotFoundException(username: String) : NotFoundException("Пользователь с именем $username не найден")

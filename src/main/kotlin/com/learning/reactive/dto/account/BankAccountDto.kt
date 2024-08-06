@@ -6,7 +6,7 @@ import java.util.*
 /**
  * Банковский счет
  */
-data class BankAccountDto (
+data class BankAccountDto(
     /**
      * Идентификатор
      */

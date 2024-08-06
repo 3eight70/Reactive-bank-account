@@ -5,7 +5,7 @@ import java.util.*
 /**
  * Dto для пользователя
  */
-data class UserDto (
+data class UserDto(
     /**
      * Идентификатор
      * Пример: 5bb2ade3-1192-4f37-8faa-c87bbd993fcd

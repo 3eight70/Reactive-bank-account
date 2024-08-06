@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 /**
  * Dto для ответов сервера
  */
-data class Response (
+data class Response(
     /**
      * Статус ответа
      */

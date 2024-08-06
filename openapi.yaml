@@ -168,11 +168,39 @@ paths:
     post:
       tags:
         - Счет
+      summary: Создание счета
+      description: Позволяет пользователю открыть новый счет
+      operationId: createAccount
+      responses:
+        '200':
+          description: Счет успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankAccountDto'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/BankAccountDto'
+      security:
+        - bearerAuth:
+            - type:http
+            - scheme:bearer
+  /api/v1/account/transfer:
+    post:
+      tags:
+        - Счет
       summary: Перевод денег
       description: Позволяет пользователю перевести деньги на другой счет
       operationId: sendMoney
       parameters:
-        - name: accountId
+        - name: accountIdFrom
+          in: query
+          description: Id счета, откуда перевести деньги
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: accountIdWhere
           in: query
           description: Id счета, куда перевести деньги
           required: true
@@ -199,7 +227,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'  
         '401':
-          description: Неавторизован
+          description: Не авторизован
           content:
             application/json:
                 schema:
@@ -211,6 +239,108 @@ paths:
         - bearerAuth:
           - type:http
           - scheme:bearer
+  /api/v1/account/history:
+    get:
+      tags:
+        - Счет
+      summary: Получение истории операций счета
+      description: Позволяет пользователю получить историю операций своего счета
+      operationId: accountOperationsHistory
+      parameters:
+        - name: accountId
+          in: query
+          description: Id счета
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: История операций успешно получена
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ShortTransactionDto'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ShortTransactionDto'
+        '404':
+          description: Счет с указанным идентификатором не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - bearerAuth:
+            - type:http
+            - scheme:bearer
+  /api/v1/account/transaction/{transactionId}:
+    get:
+      tags:
+        - Счет
+      summary: Получение информации о транзакции
+      description: Позволяет пользователю получить подробную информацию о проведенной транзакции
+      operationId: transactionInfo
+      parameters:
+        - name: transactionId
+          in: path
+          description: Id транзакции
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Информация о транзакции успешно получена
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransactionDto'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransactionDto'
+        '404':
+          description: Транзакция с указанным идентификатором не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - bearerAuth:
+            - type:http
+            - scheme:bearer
 components:
   schemas:
     LoginUserRequestDto:
@@ -289,6 +419,46 @@ components:
         amountOfMoney:
           type: number
           format: double
+    TransactionDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        accountIdFrom:
+          type: string
+          format: uuid
+        accountIdWhere:
+          type: string
+          format: uuid
+        amount:
+          type: string
+          format: decimal
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/TransactionEnum'
+    ShortTransactionDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        amount:
+          type: string
+          format: decimal
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/TransactionEnum'
+    TransactionEnum:
+      type: string
+      enum:
+        - REFILL
+        - TRANSFER
+        - DEPOSIT
   securitySchemes:
     bearerAuth:
       type: http

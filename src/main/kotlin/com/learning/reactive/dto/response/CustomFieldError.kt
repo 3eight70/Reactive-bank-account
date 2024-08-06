@@ -3,7 +3,7 @@ package com.learning.reactive.dto.response
 /**
  * Dto для отображения ошибок валидации
  */
-data class CustomFieldError (
+data class CustomFieldError(
     /**
      * Поле, в котором допущена ошибка
      */

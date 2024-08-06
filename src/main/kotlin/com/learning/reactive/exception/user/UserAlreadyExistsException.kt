@@ -1,3 +1,5 @@
 package com.learning.reactive.exception.user
 
-class UserAlreadyExistsException(message: String) : RuntimeException(message)
+import com.learning.reactive.exception.common.BadRequestException
+
+class UserAlreadyExistsException(message: String) : BadRequestException(message)

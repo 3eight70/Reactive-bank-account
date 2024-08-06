@@ -22,7 +22,7 @@ class UserController(
      * Метод, отвечающий за регистрацию пользователя
      */
     @PostMapping("/register")
-    fun registerUser(@RequestBody @Valid registerUserRequestDto: RegisterUserRequestDto) : Mono<UserDto>{
+    fun registerUser(@RequestBody @Valid registerUserRequestDto: RegisterUserRequestDto): Mono<UserDto> {
         return userService.registerUser(registerUserRequestDto)
     }
 
@@ -30,7 +30,7 @@ class UserController(
      * Метод, отвечающий за авторизацию пользователя
      */
     @PostMapping("/login")
-    fun loginUser(@RequestBody @Valid loginUserRequestDto: LoginUserRequestDto) : Mono<AuthResponseDto>{
+    fun loginUser(@RequestBody @Valid loginUserRequestDto: LoginUserRequestDto): Mono<AuthResponseDto> {
         return userService.loginUser(loginUserRequestDto)
     }
 
@@ -38,7 +38,7 @@ class UserController(
      * Метод, отвечающий за получение профиля пользователя
      */
     @GetMapping
-    fun getProfile(authentication: Authentication) : Mono<UserDto> {
+    fun getProfile(authentication: Authentication): Mono<UserDto> {
         return userService.getProfile(authentication)
     }
 }

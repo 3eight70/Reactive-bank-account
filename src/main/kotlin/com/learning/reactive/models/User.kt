@@ -11,7 +11,7 @@ import java.util.*
  */
 @Entity
 @Table(name = "t_users")
-class User (
+class User(
     /**
      * Идентификатор
      */
@@ -22,7 +22,7 @@ class User (
     /**
      * Логин
      */
-    @Column(name = "login",unique = true, nullable = false)
+    @Column(name = "login", unique = true, nullable = false)
     private val login: String,
 
     /**
@@ -36,7 +36,7 @@ class User (
      */
     @Column(name = "password", nullable = false)
     private var passwordHash: String
-): UserDetails {
+) : UserDetails {
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         return mutableListOf(SimpleGrantedAuthority("ROLE_USER"))
     }

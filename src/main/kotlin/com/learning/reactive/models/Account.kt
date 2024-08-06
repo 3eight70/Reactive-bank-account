@@ -9,7 +9,7 @@ import java.util.*
  */
 @Entity
 @Table(name = "t_accounts")
-data class Account (
+data class Account(
     /**
      * Идентификатор
      */
@@ -27,5 +27,5 @@ data class Account (
      * Баланс счета
      */
     @Column(name = "balance", nullable = false)
-    val balance: BigDecimal
+    var balance: BigDecimal
 )

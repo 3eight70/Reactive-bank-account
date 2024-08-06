@@ -10,5 +10,5 @@ import reactor.core.publisher.Mono
 interface UserService {
     fun registerUser(dto: RegisterUserRequestDto): Mono<UserDto>
     fun loginUser(dto: LoginUserRequestDto): Mono<AuthResponseDto>
-    fun getProfile(authentication : Authentication): Mono<UserDto>
+    fun getProfile(authentication: Authentication): Mono<UserDto>
 }

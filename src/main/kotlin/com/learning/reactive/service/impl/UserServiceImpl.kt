@@ -6,14 +6,13 @@ import com.learning.reactive.dto.user.RegisterUserRequestDto
 import com.learning.reactive.dto.user.UserDto
 import com.learning.reactive.exception.user.UserAlreadyExistsException
 import com.learning.reactive.models.User
-import com.learning.reactive.repository.ReactiveUserRepository
+import com.learning.reactive.repository.reactive.ReactiveUserRepository
 import com.learning.reactive.security.CustomPrincipal
 import com.learning.reactive.security.SecurityService
 import com.learning.reactive.service.UserService
 import org.springframework.security.core.Authentication
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Mono
 import java.util.*
 
@@ -23,7 +22,6 @@ class UserServiceImpl(
     private val securityService: SecurityService,
     private val passwordEncoder: PasswordEncoder
 ) : UserService {
-    @Transactional
     override fun registerUser(dto: RegisterUserRequestDto): Mono<UserDto> {
         return userRepository.findByEmail(dto.email!!)
             .flatMap<UserDto> {
@@ -71,7 +69,6 @@ class UserServiceImpl(
             }
     }
 
-    @Transactional(readOnly = true)
     override fun getProfile(authentication: Authentication): Mono<UserDto> {
         val principal = authentication.principal as CustomPrincipal
 

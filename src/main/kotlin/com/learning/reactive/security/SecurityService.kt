@@ -1,8 +1,8 @@
 package com.learning.reactive.security
 
-import com.learning.reactive.exception.security.UnauthorizedException
+import com.learning.reactive.exception.common.UnauthorizedException
 import com.learning.reactive.models.User
-import com.learning.reactive.repository.ReactiveUserRepository
+import com.learning.reactive.repository.reactive.ReactiveUserRepository
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
@@ -68,7 +68,11 @@ class SecurityService(
         return userRepository.findByLogin(login)
             .flatMap { user ->
                 when {
-                    !passwordEncoder.matches(password, user.password) -> Mono.error(UnauthorizedException("Неверный пароль"))
+                    !passwordEncoder.matches(
+                        password,
+                        user.password
+                    ) -> Mono.error(UnauthorizedException("Неверный пароль"))
+
                     else -> Mono.just(generateToken(user))
                 }
             }

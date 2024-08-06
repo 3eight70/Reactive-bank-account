@@ -1,13 +1,11 @@
 package com.learning.reactive.security
 
-import com.learning.reactive.exception.security.UnauthorizedException
+import com.learning.reactive.exception.common.UnauthorizedException
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import reactor.core.publisher.Mono
 import java.util.*
-import javax.crypto.SecretKey
-import javax.crypto.spec.SecretKeySpec
 
 class JwtHandler(
     private val secret: String
@@ -16,14 +14,14 @@ class JwtHandler(
 
     fun checkToken(accessToken: String): Mono<VerificationResult> {
         return Mono.just(verify(accessToken))
-            .onErrorResume { e -> Mono.error(UnauthorizedException(e.message ?: "Unauthorized")) }
+            .onErrorResume { e -> Mono.error(UnauthorizedException(e.message ?: "Не авторизован")) }
     }
 
     private fun verify(token: String): VerificationResult {
         val claims = getClaims(token)
         val expirationDate = claims.expiration
 
-        if (expirationDate.before(Date())){
+        if (expirationDate.before(Date())) {
             throw UnauthorizedException("Время жизни токена истекло")
         }
 

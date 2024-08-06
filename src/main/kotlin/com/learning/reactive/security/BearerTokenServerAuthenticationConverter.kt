@@ -22,9 +22,11 @@ class BearerTokenServerAuthenticationConverter(
     }
 
     private fun extractHeader(exchange: ServerWebExchange?): Mono<String> {
-        return Mono.justOrEmpty(exchange
-            ?.request
-            ?.headers
-            ?.getFirst(HttpHeaders.AUTHORIZATION))
+        return Mono.justOrEmpty(
+            exchange
+                ?.request
+                ?.headers
+                ?.getFirst(HttpHeaders.AUTHORIZATION)
+        )
     }
 }

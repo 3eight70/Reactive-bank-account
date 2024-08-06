@@ -3,7 +3,6 @@ package com.learning.reactive.config
 import com.learning.reactive.security.AuthenticationManager
 import com.learning.reactive.security.BearerTokenServerAuthenticationConverter
 import com.learning.reactive.security.JwtHandler
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -23,8 +22,6 @@ class WebSecurityConfig(
     @Value("\${jwt.secret}")
     private val secret: String
 ) {
-    private val log = LoggerFactory.getLogger(WebSecurityConfig::class.java)
-
     @Bean
     fun securityWebFilterChain(http: ServerHttpSecurity, authManager: AuthenticationManager): SecurityWebFilterChain {
         return http
@@ -39,13 +36,11 @@ class WebSecurityConfig(
             .exceptionHandling { exception ->
                 exception
                     .authenticationEntryPoint { serverWebExchange, ex ->
-                        log.error("IN securityWebFilterChain - unauthorized error: {}", ex.message)
                         Mono.fromRunnable {
                             serverWebExchange.response.statusCode = HttpStatus.UNAUTHORIZED
                         }
                     }
                     .accessDeniedHandler { serverWebExchange, ex ->
-                        log.error("IN securityWebFilterChain - access denied: {}", ex.message)
                         Mono.fromRunnable {
                             serverWebExchange.response.statusCode = HttpStatus.FORBIDDEN
                         }
