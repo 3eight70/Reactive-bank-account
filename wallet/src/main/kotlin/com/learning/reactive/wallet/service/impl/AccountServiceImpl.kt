@@ -1,5 +1,6 @@
 package com.learning.reactive.wallet.service.impl
 
+import com.learning.reactive.wallet.dto.account.AccountBalanceDto
 import com.learning.reactive.wallet.dto.account.BankAccountDto
 import com.learning.reactive.wallet.dto.deposit.DepositDto
 import com.learning.reactive.wallet.dto.transaction.ShortTransactionDto
@@ -9,6 +10,7 @@ import com.learning.reactive.wallet.dto.transaction.TransactionRequestDto
 import com.learning.reactive.wallet.exception.account.AccountNotFoundException
 import com.learning.reactive.wallet.exception.account.NotEnoughBalanceException
 import com.learning.reactive.wallet.exception.common.BadRequestException
+import com.learning.reactive.wallet.exception.common.CustomTimeoutException
 import com.learning.reactive.wallet.exception.common.ForbiddenException
 import com.learning.reactive.wallet.exception.transaction.TransactionNotFoundException
 import com.learning.reactive.wallet.models.Account
@@ -17,26 +19,42 @@ import com.learning.reactive.wallet.repository.reactive.ReactiveAccountRepositor
 import com.learning.reactive.wallet.repository.reactive.ReactiveTransactionRepository
 import com.learning.reactive.wallet.security.CustomPrincipal
 import com.learning.reactive.wallet.service.AccountService
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.data.redis.RedisConnectionFailureException
+import org.springframework.data.redis.core.ReactiveRedisTemplate
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
 import java.math.BigDecimal
+import java.time.Duration
 import java.time.LocalDateTime
 import java.util.*
+import java.util.concurrent.TimeoutException
 
 @Service
 class AccountServiceImpl(
+    @Value("\${application.retry}")
+    private val retries: Long,
+    @Value("\${application.timeout}")
+    private val timeout: Long,
     private val accountRepository: ReactiveAccountRepository,
-    private val transactionRepository: ReactiveTransactionRepository
+    private val transactionRepository: ReactiveTransactionRepository,
+    private val redisTemplate: ReactiveRedisTemplate<String, AccountBalanceDto>
 ) : AccountService {
     override fun getAccounts(principal: CustomPrincipal): Flux<BankAccountDto> {
         return accountRepository.findAllByUserId(principal.getId())
             .map {
                 BankAccountDto(
-                    it.id,
-                    it.balance
+                    it.id
                 )
+            }
+            .retry(retries)
+            .timeout(Duration.ofSeconds(timeout))
+            .onErrorMap { throwable ->
+                when (throwable) {
+                    is TimeoutException -> CustomTimeoutException()
+                    else -> throwable
+                }
             }
     }
 
@@ -72,6 +90,7 @@ class AccountServiceImpl(
                 accountFrom.balance = accountFrom.balance.subtract(amountOfMoney)
                 accountWhere.balance = accountWhere.balance.add(amountOfMoney)
 
+
                 Mono.zip(
                     accountRepository.save(accountFrom),
                     accountRepository.save(accountWhere)
@@ -96,6 +115,39 @@ class AccountServiceImpl(
                             TransactionEnum.TRANSFER
                         )
                     }
+                    .flatMap { transaction ->
+                        val updateRedis = Mono.zip(
+                            redisTemplate.opsForValue().set(
+                                accountIdFrom.toString(),
+                                AccountBalanceDto(principal.getId(), accountIdFrom, accountFrom.balance)
+                            )
+                                .onErrorResume { Mono.empty() },
+                            redisTemplate.opsForValue().set(
+                                accountIdWhere.toString(),
+                                AccountBalanceDto(principal.getId(), accountIdWhere, accountWhere.balance)
+                            )
+                                .onErrorResume { Mono.empty() }
+                        ).then()
+
+                        updateRedis.thenReturn(
+                            TransactionDto(
+                                transaction.id,
+                                transaction.accountIdFrom!!,
+                                transaction.accountIdWhere,
+                                transaction.amount,
+                                transaction.timestamp,
+                                TransactionEnum.TRANSFER
+                            )
+                        )
+                    }
+            }
+            .retry(retries)
+            .timeout(Duration.ofSeconds(timeout))
+            .onErrorMap { throwable ->
+                when (throwable) {
+                    is TimeoutException -> CustomTimeoutException()
+                    else -> throwable
+                }
             }
     }
 
@@ -109,9 +161,16 @@ class AccountServiceImpl(
         ).flatMap { accountRepository.save(it) }
             .map {
                 BankAccountDto(
-                    it.id,
-                    it.balance
+                    it.id
                 )
+            }
+            .retry(retries)
+            .timeout(Duration.ofSeconds(timeout))
+            .onErrorMap { throwable ->
+                when (throwable) {
+                    is TimeoutException -> CustomTimeoutException()
+                    else -> throwable
+                }
             }
     }
 
@@ -132,9 +191,21 @@ class AccountServiceImpl(
                         )
                     }
             }
+            .retry(retries)
+            .timeout(Duration.ofSeconds(timeout))
+            .onErrorMap { throwable ->
+                when (throwable) {
+                    is TimeoutException -> CustomTimeoutException()
+                    else -> throwable
+                }
+            }
     }
 
-    override fun getTransactionInfo(principal: CustomPrincipal, accountId: UUID, transactionId: UUID): Mono<TransactionDto> {
+    override fun getTransactionInfo(
+        principal: CustomPrincipal,
+        accountId: UUID,
+        transactionId: UUID
+    ): Mono<TransactionDto> {
         return accountRepository.findById(accountId)
             .switchIfEmpty(Mono.error(AccountNotFoundException(accountId)))
             .flatMap { account ->
@@ -145,7 +216,7 @@ class AccountServiceImpl(
                 transactionRepository.findById(transactionId)
                     .switchIfEmpty(Mono.error(TransactionNotFoundException(transactionId)))
                     .flatMap { trans ->
-                        if (trans.accountIdFrom != accountId && trans.accountIdWhere != accountId){
+                        if (trans.accountIdFrom != accountId && trans.accountIdWhere != accountId) {
                             return@flatMap Mono.error<TransactionDto>(TransactionNotFoundException(transactionId))
                         }
 
@@ -160,6 +231,66 @@ class AccountServiceImpl(
                             )
                         )
                     }
+            }
+            .retry(retries)
+            .timeout(Duration.ofSeconds(timeout))
+            .onErrorMap { throwable ->
+                when (throwable) {
+                    is TimeoutException -> CustomTimeoutException()
+                    else -> throwable
+                }
+            }
+    }
+
+    override fun checkAccountBalance(principal: CustomPrincipal, accountId: UUID): Mono<BigDecimal> {
+        val stringId = accountId.toString()
+        val userId = principal.getId()
+
+        return redisTemplate.hasKey(stringId)
+            .flatMap { exists ->
+                if (exists) {
+                    redisTemplate.opsForValue().get(stringId)
+                        .flatMap { accountBalanceDto ->
+                            if (accountBalanceDto.userId != userId) {
+                                Mono.error(ForbiddenException())
+                            } else {
+                                Mono.just(accountBalanceDto.balance)
+                            }
+                        }
+                } else {
+                    accountRepository.findById(accountId)
+                        .switchIfEmpty(Mono.error(AccountNotFoundException(accountId)))
+                        .flatMap { account ->
+                            if (account.userId != principal.getId()) {
+                                return@flatMap Mono.error(ForbiddenException())
+                            }
+
+                            redisTemplate.opsForValue().set(
+                                stringId,
+                                AccountBalanceDto(userId, accountId, account.balance)
+                            ).thenReturn(account.balance)
+                        }
+                }
+            }
+            .retry(retries)
+            .timeout(Duration.ofSeconds(timeout))
+            .onErrorResume { throwable ->
+                when (throwable) {
+                    is RedisConnectionFailureException -> {
+                        accountRepository.findById(accountId)
+                            .switchIfEmpty(Mono.error(AccountNotFoundException(accountId)))
+                            .flatMap { account ->
+                                if (account.userId != principal.getId()) {
+                                    return@flatMap Mono.error(ForbiddenException())
+                                }
+
+                                Mono.just(account.balance)
+                            }
+                    }
+
+                    is TimeoutException -> Mono.error(CustomTimeoutException())
+                    else -> Mono.error(throwable)
+                }
             }
     }
 

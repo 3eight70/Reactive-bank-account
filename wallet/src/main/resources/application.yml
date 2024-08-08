@@ -20,6 +20,12 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+  data:
+    redis:
+      repositories:
+        enabled: false
+      host: localhost
+      port: 6379
 
 jwt:
   password:
@@ -32,3 +38,7 @@ jwt:
   issuer: ${JWT_ISSUER:bank}
 server:
   port: 8080
+
+application:
+  retry: ${AMOUNT_OF_RETRIES:3}
+  timeout: ${TIMEOUT_IN_SECONDS:2}

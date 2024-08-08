@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import java.math.BigDecimal
 import java.util.*
 
 /**
@@ -89,5 +90,20 @@ class AccountController(
         @PathVariable("transactionId") transactionId: UUID
     ): Mono<TransactionDto> {
         return accountService.getTransactionInfo(authentication.principal as CustomPrincipal, accountId, transactionId)
+    }
+
+    /**
+     * Метод, отвечающий за получение баланса на счету
+     *
+     * @param accountId - идентификатор счета
+     *
+     * @return Mono<BigDecimal> - баланс счета
+     */
+    @GetMapping("/balance")
+    fun getBalance(
+        authentication: Authentication,
+        @RequestParam("accountId") accountId: UUID
+    ): Mono<BigDecimal> {
+        return accountService.checkAccountBalance(authentication.principal as CustomPrincipal, accountId)
     }
 }

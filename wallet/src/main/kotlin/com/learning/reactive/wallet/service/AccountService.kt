@@ -7,6 +7,7 @@ import com.learning.reactive.wallet.dto.transaction.TransactionRequestDto
 import com.learning.reactive.wallet.security.CustomPrincipal
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import java.math.BigDecimal
 import java.util.*
 
 /**
@@ -21,4 +22,5 @@ interface AccountService {
     fun createAccount(principal: CustomPrincipal): Mono<BankAccountDto>
     fun accountHistory(principal: CustomPrincipal, accountId: UUID): Flux<ShortTransactionDto>
     fun getTransactionInfo(principal: CustomPrincipal, accountId: UUID, transactionId: UUID): Mono<TransactionDto>
+    fun checkAccountBalance(principal: CustomPrincipal, accountId: UUID): Mono<BigDecimal>
 }

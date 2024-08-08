@@ -46,6 +46,7 @@
 		<jwt.version>0.12.6</jwt.version>
 		<jakarta.version>3.1.0</jakarta.version>
 		<kafka.version>3.2.1</kafka.version>
+		<jedis.version>5.1.4</jedis.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -67,6 +68,11 @@
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-starter-security</artifactId>
+				<version>${spring-boot.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-data-redis-reactive</artifactId>
 				<version>${spring-boot.version}</version>
 			</dependency>
 			<dependency>

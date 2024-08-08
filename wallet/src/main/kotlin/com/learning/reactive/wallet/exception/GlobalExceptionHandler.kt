@@ -2,15 +2,13 @@ package com.learning.reactive.wallet.exception
 
 import com.learning.reactive.wallet.dto.response.CustomFieldError
 import com.learning.reactive.wallet.dto.response.Response
-import com.learning.reactive.wallet.exception.common.BadRequestException
-import com.learning.reactive.wallet.exception.common.ForbiddenException
-import com.learning.reactive.wallet.exception.common.NotFoundException
-import com.learning.reactive.wallet.exception.common.UnauthorizedException
+import com.learning.reactive.wallet.exception.common.*
 import io.jsonwebtoken.ExpiredJwtException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
+import org.springframework.data.redis.RedisConnectionFailureException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -93,6 +91,29 @@ class GlobalExceptionHandler {
 
         return ResponseEntity(response, HttpStatus.UNAUTHORIZED)
     }
+
+    @ExceptionHandler(CustomTimeoutException::class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    fun handle(e: CustomTimeoutException): ResponseEntity<Response> {
+        val response = Response(
+            status = HttpStatus.SERVICE_UNAVAILABLE.value(),
+            message = e.message
+        )
+
+        return ResponseEntity(response, HttpStatus.SERVICE_UNAVAILABLE)
+    }
+
+    @ExceptionHandler(RedisConnectionFailureException::class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    fun handle(e: RedisConnectionFailureException): ResponseEntity<Response> {
+        val response = Response(
+            status = HttpStatus.SERVICE_UNAVAILABLE.value(),
+            message = "В данный момент сервис недоступен, попробуйте позже..."
+        )
+
+        return ResponseEntity(response, HttpStatus.SERVICE_UNAVAILABLE)
+    }
+
 
     @ExceptionHandler(Exception::class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

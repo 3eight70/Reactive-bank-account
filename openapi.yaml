@@ -185,6 +185,54 @@ paths:
         - bearerAuth:
             - type:http
             - scheme:bearer
+  /api/v1/account/balance:
+    get:
+      tags:
+        - Счет
+      summary: Получение баланса на счету
+      description: Позволяет пользователю получить баланс счета
+      operationId: getBalance
+      parameters:
+        - name: accountId
+          in: query
+          description: Id счета
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Баланс успешно получен
+          content:
+            application/json:
+              schema:
+                type: string
+                format: decimal
+            application/xml:
+              schema:
+                type: string
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Счет с указанным id не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+        - bearerAuth:
+            - type:http
+            - scheme:bearer
   /api/v1/account/transfer:
     post:
       tags:
@@ -216,16 +264,7 @@ paths:
                   $ref: '#/components/schemas/BankAccountDto'          
             application/xml:
               schema:
-                $ref: '#/components/schemas/BankAccountDto'   
-        '400':
-          description: Неверный id счета
-          content:
-            application/json:
-                schema:
-                  $ref: '#/components/schemas/Response'          
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Response'  
+                $ref: '#/components/schemas/BankAccountDto'
         '401':
           description: Не авторизован
           content:
@@ -234,7 +273,16 @@ paths:
                   $ref: '#/components/schemas/Response'          
             application/xml:
               schema:
-                $ref: '#/components/schemas/Response'  
+                $ref: '#/components/schemas/Response'
+        '404':
+          description: Счет с указанным id не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Response'
       security:
         - bearerAuth:
           - type:http

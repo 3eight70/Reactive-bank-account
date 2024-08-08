@@ -4,20 +4,28 @@ import com.learning.reactive.wallet.dto.user.AuthResponseDto
 import com.learning.reactive.wallet.dto.user.LoginUserRequestDto
 import com.learning.reactive.wallet.dto.user.RegisterUserRequestDto
 import com.learning.reactive.wallet.dto.user.UserDto
+import com.learning.reactive.wallet.exception.common.CustomTimeoutException
 import com.learning.reactive.wallet.exception.user.UserAlreadyExistsException
 import com.learning.reactive.wallet.models.User
 import com.learning.reactive.wallet.repository.reactive.ReactiveUserRepository
 import com.learning.reactive.wallet.security.CustomPrincipal
 import com.learning.reactive.wallet.security.SecurityService
 import com.learning.reactive.wallet.service.UserService
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.Authentication
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
+import java.time.Duration
 import java.util.*
+import java.util.concurrent.TimeoutException
 
 @Service
 class UserServiceImpl(
+    @Value("\${application.retry}")
+    private val retries: Long,
+    @Value("\${application.timeout}")
+    private val timeout: Long,
     private val userRepository: ReactiveUserRepository,
     private val securityService: SecurityService,
     private val passwordEncoder: PasswordEncoder
@@ -53,6 +61,14 @@ class UserServiceImpl(
                         )
                     }
             )
+            .retry(retries)
+            .timeout(Duration.ofSeconds(timeout))
+            .onErrorMap { throwable ->
+                when (throwable){
+                    is TimeoutException -> CustomTimeoutException()
+                    else -> throwable
+                }
+            }
     }
 
     override fun loginUser(dto: LoginUserRequestDto): Mono<AuthResponseDto> {
@@ -67,6 +83,14 @@ class UserServiceImpl(
                     )
                 )
             }
+            .retry(retries)
+            .timeout(Duration.ofSeconds(timeout))
+            .onErrorMap { throwable ->
+                when (throwable){
+                    is TimeoutException -> CustomTimeoutException()
+                    else -> throwable
+                }
+            }
     }
 
     override fun getProfile(authentication: Authentication): Mono<UserDto> {
@@ -79,6 +103,14 @@ class UserServiceImpl(
                     user.username,
                     user.getEmail()
                 )
+            }
+            .retry(retries)
+            .timeout(Duration.ofSeconds(timeout))
+            .onErrorMap { throwable ->
+                when (throwable){
+                    is TimeoutException -> CustomTimeoutException()
+                    else -> throwable
+                }
             }
     }
 }
