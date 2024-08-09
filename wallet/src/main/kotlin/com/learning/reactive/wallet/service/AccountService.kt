@@ -1,6 +1,7 @@
 package com.learning.reactive.wallet.service
 
 import com.learning.reactive.wallet.dto.account.BankAccountDto
+import com.learning.reactive.wallet.dto.deposit.DepositDto
 import com.learning.reactive.wallet.dto.transaction.ShortTransactionDto
 import com.learning.reactive.wallet.dto.transaction.TransactionDto
 import com.learning.reactive.wallet.dto.transaction.TransactionRequestDto
@@ -23,4 +24,5 @@ interface AccountService {
     fun accountHistory(principal: CustomPrincipal, accountId: UUID): Flux<ShortTransactionDto>
     fun getTransactionInfo(principal: CustomPrincipal, accountId: UUID, transactionId: UUID): Mono<TransactionDto>
     fun checkAccountBalance(principal: CustomPrincipal, accountId: UUID): Mono<BigDecimal>
+    fun processDeposit(deposit: DepositDto): Mono<Void>
 }

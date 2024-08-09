@@ -9,3 +9,7 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+application:
+  retry: ${AMOUNT_OF_RETRIES:3}
+  timeout: ${TIMEOUT_IN_SECONDS:2}

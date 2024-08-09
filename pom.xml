@@ -24,7 +24,8 @@
     <modules>
         <module>atm</module>
 		<module>wallet</module>
-	</modules>
+        <module>shared-dto</module>
+    </modules>
     <scm>
 		<connection/>
 		<developerConnection/>

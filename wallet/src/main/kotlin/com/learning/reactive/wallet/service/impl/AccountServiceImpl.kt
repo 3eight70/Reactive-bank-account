@@ -294,12 +294,54 @@ class AccountServiceImpl(
             }
     }
 
-    fun processDeposit(deposit: DepositDto) {
+    override fun processDeposit(deposit: DepositDto): Mono<Void> {
+        val accountId = deposit.accountId
 
+        return accountRepository.findById(accountId)
+            .switchIfEmpty(Mono.error(AccountNotFoundException(accountId)))
+            .flatMap { account ->
+                account.balance = account.balance.add(deposit.amount)
+                accountRepository.save(account)
+                    .flatMap {
+                        val transaction = Transaction(
+                            UUID.randomUUID(),
+                            null,
+                            accountId,
+                            deposit.amount,
+                            LocalDateTime.now()
+                        )
+
+                        transactionRepository.save(transaction)
+                            .then(
+                                Mono.defer {
+                                    redisTemplate.opsForValue().set(
+                                        accountId.toString(), AccountBalanceDto(
+                                            account.userId,
+                                            accountId,
+                                            account.balance
+                                        )
+                                    )
+                                        .then()
+                                        .onErrorResume { e ->
+                                            Mono.empty()
+                                        }
+                                }
+                            )
+                    }
+            }
+            .retry(retries)
+            .timeout(Duration.ofSeconds(timeout))
+            .onErrorMap { throwable ->
+                when (throwable) {
+                    is TimeoutException -> CustomTimeoutException()
+                    else -> throwable
+                }
+            }
     }
 
     private fun determineTransactionStatus(transaction: Transaction, accountId: UUID): TransactionEnum {
-        return if (transaction.accountIdWhere == accountId) TransactionEnum.REFILL
+        return if (transaction.accountIdFrom == null) TransactionEnum.DEPOSIT
+        else if (transaction.accountIdWhere == accountId) TransactionEnum.REFILL
         else TransactionEnum.TRANSFER
     }
 }
