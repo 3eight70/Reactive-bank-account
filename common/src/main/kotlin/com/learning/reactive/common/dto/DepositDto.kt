@@ -1,4 +1,4 @@
-package com.learning.reactive.wallet.dto.deposit
+package com.learning.reactive.common.dto
 
 import java.math.BigDecimal
 import java.util.*

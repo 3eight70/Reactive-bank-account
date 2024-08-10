@@ -1,7 +1,7 @@
 package com.learning.reactive.wallet.service
 
+import com.learning.reactive.common.dto.DepositDto
 import com.learning.reactive.wallet.dto.account.BankAccountDto
-import com.learning.reactive.wallet.dto.deposit.DepositDto
 import com.learning.reactive.wallet.dto.transaction.ShortTransactionDto
 import com.learning.reactive.wallet.dto.transaction.TransactionDto
 import com.learning.reactive.wallet.dto.transaction.TransactionRequestDto

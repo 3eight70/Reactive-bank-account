@@ -1,8 +1,8 @@
 package com.learning.reactive.atm.controller
 
-import com.learning.reactive.atm.dto.DepositDto
 import com.learning.reactive.atm.dto.DepositResponseDto
 import com.learning.reactive.atm.producer.KafkaProducer
+import com.learning.reactive.common.dto.DepositDto
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping

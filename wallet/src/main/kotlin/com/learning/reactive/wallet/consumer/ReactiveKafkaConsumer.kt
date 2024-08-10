@@ -1,6 +1,6 @@
 package com.learning.reactive.wallet.consumer
 
-import com.learning.reactive.wallet.dto.deposit.DepositDto
+import com.learning.reactive.common.dto.DepositDto
 import com.learning.reactive.wallet.service.AccountService
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.slf4j.LoggerFactory

@@ -1,6 +1,6 @@
 package com.learning.reactive.atm.producer
 
-import com.learning.reactive.atm.dto.DepositDto
+import com.learning.reactive.common.dto.DepositDto
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.serialization.StringSerializer
 import org.springframework.beans.factory.annotation.Value
