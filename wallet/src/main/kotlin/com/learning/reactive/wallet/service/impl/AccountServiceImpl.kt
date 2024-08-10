@@ -8,6 +8,7 @@ import com.learning.reactive.wallet.dto.transaction.TransactionDto
 import com.learning.reactive.wallet.dto.transaction.TransactionEnum
 import com.learning.reactive.wallet.dto.transaction.TransactionRequestDto
 import com.learning.reactive.wallet.exception.account.AccountNotFoundException
+import com.learning.reactive.wallet.exception.account.BadAmountOfMoneyException
 import com.learning.reactive.wallet.exception.account.NotEnoughBalanceException
 import com.learning.reactive.wallet.exception.common.BadRequestException
 import com.learning.reactive.wallet.exception.common.CustomTimeoutException
@@ -77,6 +78,10 @@ class AccountServiceImpl(
             .flatMap { tuple ->
                 val accountFrom = tuple.t1
                 val accountWhere = tuple.t2
+
+                if (transactionRequestDto.amount <= BigDecimal.ZERO) {
+                    return@flatMap Mono.error<TransactionDto>(BadAmountOfMoneyException())
+                }
 
                 if (accountFrom.userId != principal.getId()) {
                     return@flatMap Mono.error<TransactionDto>(ForbiddenException())
@@ -300,6 +305,10 @@ class AccountServiceImpl(
         return accountRepository.findById(accountId)
             .switchIfEmpty(Mono.error(AccountNotFoundException(accountId)))
             .flatMap { account ->
+                if (deposit.amount <= BigDecimal.ZERO){
+                    return@flatMap Mono.error(BadAmountOfMoneyException())
+                }
+
                 account.balance = account.balance.add(deposit.amount)
                 accountRepository.save(account)
                     .flatMap {
