@@ -5,7 +5,7 @@ spring:
     enabled: true
     change-log: db/changelog/main-changelog.xml
   datasource:
-    url: ${JDBC_URL:jdbc:postgresql://localhost:5432/reactive}
+    url: ${JDBC_URL:jdbc:postgresql://postgres:5432/reactive}
     username: ${JDBC_USERNAME:postgres}
     password: ${JDBC_PASSWORD:gbhfns}
     driverClassName: org.postgresql.Driver
@@ -16,7 +16,7 @@ spring:
   main:
     web-application-type: reactive
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP:http://localhost:29092}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP:broker:29092}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -24,7 +24,7 @@ spring:
     redis:
       repositories:
         enabled: false
-      host: ${REDIS_HOST:localhost}
+      host: ${REDIS_HOST:redis}
       port: ${REDIS_PORT:6379}
 
 jwt:
@@ -36,7 +36,6 @@ jwt:
   secret: ${JWT_SECRET:8506876256f3e572b83d7d5a0b86b503c7b7e68c430d69d5307e865d8619d05f}
   expiration: ${JWT_EXPIRATION:3600}
   issuer: ${JWT_ISSUER:bank}
-
 server:
   port: 8080
 
