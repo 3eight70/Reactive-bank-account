@@ -213,7 +213,7 @@ class AccountServiceImpl(
     ): Mono<TransactionDto> {
         return accountRepository.findById(accountId)
             .switchIfEmpty(Mono.error(AccountNotFoundException(accountId)))
-            .flatMap { account ->
+            .flatMap  { account ->
                 if (account.userId != principal.getId()) {
                     return@flatMap Mono.error<TransactionDto>(ForbiddenException())
                 }
@@ -331,7 +331,7 @@ class AccountServiceImpl(
                                         )
                                     )
                                         .then()
-                                        .onErrorResume { e ->
+                                        .onErrorResume { _ ->
                                             Mono.empty()
                                         }
                                 }

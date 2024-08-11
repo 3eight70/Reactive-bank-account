@@ -35,12 +35,12 @@ class WebSecurityConfig(
             }
             .exceptionHandling { exception ->
                 exception
-                    .authenticationEntryPoint { serverWebExchange, ex ->
+                    .authenticationEntryPoint { serverWebExchange, _ ->
                         Mono.fromRunnable {
                             serverWebExchange.response.statusCode = HttpStatus.UNAUTHORIZED
                         }
                     }
-                    .accessDeniedHandler { serverWebExchange, ex ->
+                    .accessDeniedHandler { serverWebExchange, _ ->
                         Mono.fromRunnable {
                             serverWebExchange.response.statusCode = HttpStatus.FORBIDDEN
                         }

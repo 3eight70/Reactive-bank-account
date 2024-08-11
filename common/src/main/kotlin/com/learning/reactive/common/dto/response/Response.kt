@@ -1,4 +1,4 @@
-package com.learning.reactive.wallet.dto.response
+package com.learning.reactive.common.dto.response
 
 import java.time.LocalDateTime
 

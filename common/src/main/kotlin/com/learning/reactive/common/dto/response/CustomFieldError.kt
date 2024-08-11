@@ -1,4 +1,4 @@
-package com.learning.reactive.wallet.dto.response
+package com.learning.reactive.common.dto.response
 
 /**
  * Dto для отображения ошибок валидации

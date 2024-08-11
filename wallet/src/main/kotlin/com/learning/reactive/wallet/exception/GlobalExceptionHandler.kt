@@ -1,7 +1,7 @@
 package com.learning.reactive.wallet.exception
 
-import com.learning.reactive.wallet.dto.response.CustomFieldError
-import com.learning.reactive.wallet.dto.response.Response
+import com.learning.reactive.common.dto.response.CustomFieldError
+import com.learning.reactive.common.dto.response.Response
 import com.learning.reactive.wallet.exception.common.*
 import io.jsonwebtoken.ExpiredJwtException
 import org.slf4j.Logger
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.bind.support.WebExchangeBindException
+import org.springframework.web.server.ServerWebInputException
 
 @RestControllerAdvice
 @Order(value = Ordered.HIGHEST_PRECEDENCE)
@@ -62,6 +63,17 @@ class GlobalExceptionHandler {
     @ExceptionHandler(BadRequestException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun handle(e: BadRequestException): ResponseEntity<Response> {
+        val response = Response(
+            status = HttpStatus.BAD_REQUEST.value(),
+            message = e.message
+        )
+
+        return ResponseEntity(response, HttpStatus.BAD_REQUEST)
+    }
+
+    @ExceptionHandler(ServerWebInputException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handle(e: ServerWebInputException): ResponseEntity<Response> {
         val response = Response(
             status = HttpStatus.BAD_REQUEST.value(),
             message = e.message
