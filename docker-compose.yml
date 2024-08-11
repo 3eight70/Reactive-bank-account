@@ -30,7 +30,7 @@ services:
     depends_on:
       - postgres
       - redis
-      -
+      - kafka
   atm:
     build:
       context: ./atm
@@ -39,7 +39,7 @@ services:
       - "8081:8081"
     depends_on:
       - postgres
-      - redis
+      - kafka
   zookeeper:
     image: confluentinc/cp-zookeeper:7.0.1
     hostname: zookeeper
